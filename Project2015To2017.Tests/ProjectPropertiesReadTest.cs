@@ -295,28 +295,33 @@ namespace Project2015To2017.Tests
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
   </PropertyGroup>
-  <PropertyGroup>
-    <Configuration Condition="" '$(Configuration)' == '' "">Debug</Configuration>
-    <Platform Condition="" '$(Platform)' == '' "">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{9F9AF5F0-C2CF-48B9-BF38-FEC89FDABA4A}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Croc.XFW3.DomainModelDefinitionLanguage</RootNamespace>
-    <AssemblyName>Croc.XFW3.DomainModelDefinitionLanguage.Dsl</AssemblyName>
-    <SolutionDir Condition=""$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'"">..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
-    <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
-    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
-    <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
-  </PropertyGroup>
+  <Choose>
+    <When Condition="" '$(Foo)' == 'A' "">
+	  <PropertyGroup>
+		<Configuration Condition="" '$(Configuration)' == '' "">Debug</Configuration>
+		<Platform Condition="" '$(Platform)' == '' "">AnyCPU</Platform>
+		<ProductVersion>9.0.30729</ProductVersion>
+		<SchemaVersion>2.0</SchemaVersion>
+		<ProjectGuid>{9F9AF5F0-C2CF-48B9-BF38-FEC89FDABA4A}</ProjectGuid>
+		<OutputType>Library</OutputType>
+		<AppDesignerFolder>Properties</AppDesignerFolder>
+		<RootNamespace>Croc.XFW3.DomainModelDefinitionLanguage</RootNamespace>
+		<AssemblyName>Croc.XFW3.DomainModelDefinitionLanguage.Dsl</AssemblyName>
+		<SolutionDir Condition=""$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'"">..\</SolutionDir>
+		<RestorePackages>true</RestorePackages>
+		<IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
+		<RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+		<RuntimeIdentifier>win7-x86</RuntimeIdentifier>
+	  </PropertyGroup>
+	</When>
+  </Choose>
 </Project>";
 
 			var project = await ParseAndTransform(xml).ConfigureAwait(false);
 
-			Assert.AreEqual("Croc.XFW3.DomainModelDefinitionLanguage.Dsl", project.Property("AssemblyName")?.Value);
-			Assert.AreEqual("Croc.XFW3.DomainModelDefinitionLanguage", project.Property("RootNamespace")?.Value);
+			Assert.AreEqual("Croc.XFW3.DomainModelDefinitionLanguage.Dsl", project.Property("AssemblyName", tryConditional: true)?.Value);
+			Assert.AreEqual("Croc.XFW3.DomainModelDefinitionLanguage", project.Property("RootNamespace", tryConditional: true)?.Value);
+			Assert.IsNull(project.Property("RootNamespace", tryConditional: false)?.Value);
 			Assert.AreEqual(ApplicationType.ClassLibrary, project.Type);
 			Assert.AreEqual(2, project.PropertyGroups.Count);
 		}

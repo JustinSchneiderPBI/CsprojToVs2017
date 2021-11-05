@@ -71,12 +71,12 @@ namespace Project2015To2017.Reading
 					x.Name.LocalName == "PreBuildEvent")
 				.ToArray();
 
-			project.Imports = project.ProjectDocument.Root
+			project.Imports = project.AllProjectContainers()
 				.Elements(project.XmlNamespace + "Import")
 				.Where(x => !RemoveMSBuildImports.Contains(x.Attribute("Project")?.Value))
 				.ToArray();
 
-			project.Targets = project.ProjectDocument.Root
+			project.Targets = project.AllProjectContainers()
 				.Elements(project.XmlNamespace + "Target")
 				.ToArray();
 		}
@@ -200,8 +200,8 @@ namespace Project2015To2017.Reading
 
 		internal static void ReadPropertyGroups(Project project)
 		{
-			project.PropertyGroups = project.ProjectDocument.Root
-				.Elements(project.XmlNamespace + "PropertyGroup")
+			project.PropertyGroups = project.AllProjectContainers().SelectMany(c => c
+				.Elements(project.XmlNamespace + "PropertyGroup"))
 				.ToList();
 
 			try

@@ -170,7 +170,7 @@ namespace Project2015To2017.Reading
 		{
 			try
 			{
-				var existingPackageReferences = project.ProjectDocument.Root
+				var existingPackageReferences = project.AllProjectContainers()
 					.Elements(project.XmlNamespace + "ItemGroup")
 					.Elements(project.XmlNamespace + "PackageReference")
 					.Select(x =>
@@ -240,7 +240,7 @@ namespace Project2015To2017.Reading
 
 		private IReadOnlyList<ProjectReference> LoadProjectReferences(Project project)
 		{
-			var projectReferences = project.ProjectDocument.Root
+			var projectReferences = project.AllProjectContainers()
 				.Elements(project.XmlNamespace + "ItemGroup")
 				.Elements(project.XmlNamespace + "ProjectReference")
 				.Select(CreateProjectReference)
@@ -273,7 +273,7 @@ namespace Project2015To2017.Reading
 
 		private List<AssemblyReference> LoadAssemblyReferences(Project project)
 		{
-			return project.ProjectDocument.Root
+			return project.AllProjectContainers()
 				?.Elements(project.XmlNamespace + "ItemGroup")
 				.Elements(project.XmlNamespace + "Reference")
 				.Select(FormatAssemblyReference)
@@ -314,11 +314,10 @@ namespace Project2015To2017.Reading
 
 		private static List<XElement> LoadFileIncludes(Project project)
 		{
-			var items = project.ProjectDocument
-							?.Element(project.XmlNamespace + "Project")
-							?.Elements(project.XmlNamespace + "ItemGroup")
-							.ToList()
-						?? new List<XElement>();
+			var root = project.ProjectDocument?.Element(project.XmlNamespace + "Project");
+			var items = root?.Descendants()
+				.Where(x => x.Name.LocalName == "ItemGroup")
+				.ToList();
 
 			return items;
 		}

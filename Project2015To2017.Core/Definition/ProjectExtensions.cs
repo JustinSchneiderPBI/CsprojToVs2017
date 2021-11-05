@@ -49,6 +49,16 @@ namespace Project2015To2017.Definition
 			return (unconditional, conditional);
 		}
 
+		internal static IEnumerable<XElement> AllProjectContainers(this Project project)
+		{
+			var root = project.ProjectDocument.Root;
+			yield return root;
+
+			var nestedContainers = root.Elements(project.XmlNamespace + "Choose").Elements();
+			foreach (var nestedContainer in nestedContainers)
+				yield return nestedContainer;
+		}
+
 		public static XElement Property(this Project project, string name, bool tryConditional = false)
 		{
 			if (name == null) throw new ArgumentNullException(nameof(name));
